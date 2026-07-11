@@ -1,0 +1,886 @@
+/* =========================
+   GLOBAL
+========================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6f3;
+}
+
+body {
+  overflow: hidden;
+}
+
+/* =========================
+   DASHBOARD LAYOUT
+========================= */
+
+.dashboard {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #dfe5df;
+}
+
+.logo {
+  color: #214d33;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.status {
+  color: #2e7d32;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  height: calc(100vh - 64px);
+  display: flex;
+  overflow: hidden;
+}
+
+/* =========================
+   MAP
+========================= */
+
+.map-panel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* =========================
+   MAP CONTROLS
+========================= */
+
+.map-controls {
+  position: absolute;
+  top: 18px;
+  left: 58px;
+  z-index: 1000;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.map-controls button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #214d33;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.map-controls button:hover {
+  background: #edf5ef;
+}
+
+.map-controls button.active {
+  background: #214d33;
+  color: #ffffff;
+}
+
+/* =========================
+   AQI LEGEND
+========================= */
+
+.aqi-legend {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 1000;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  font-size: 13px;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.aqi-legend h4 {
+  margin-bottom: 8px;
+  color: #214d33;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.aqi-legend div {
+  display: flex;
+  align-items: center;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+.good {
+  background: #2ecc71;
+}
+
+.moderate {
+  background: #f1c40f;
+}
+
+.sensitive {
+  background: #f39c12;
+}
+
+.unhealthy {
+  background: #e74c3c;
+}
+
+.very-unhealthy {
+  background: #9b59b6;
+}
+
+.hazardous {
+  background: #7b241c;
+}
+
+/* =========================
+   SIDE PANEL
+========================= */
+
+.side-panel {
+  position: relative;
+  width: 430px;
+  height: 100%;
+  flex-shrink: 0;
+  padding: 22px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  scrollbar-width: thin;
+  scrollbar-color: #c9d2cb transparent;
+}
+
+.side-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.side-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.side-panel::-webkit-scrollbar-thumb {
+  background: #c9d2cb;
+  border-radius: 999px;
+}
+
+.side-panel::-webkit-scrollbar-thumb:hover {
+  background: #aebbb1;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #f2f4f2;
+  color: #374151;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e5eae5;
+  transform: scale(1.05);
+}
+
+/* =========================
+   EMPTY SIDEBAR
+========================= */
+
+.empty-sidebar {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 34px 20px;
+  text-align: center;
+}
+
+.empty-sidebar-icon {
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background: #edf6ef;
+  color: #214d33;
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.empty-sidebar h2 {
+  margin-bottom: 10px;
+  color: #17211b;
+  font-size: 22px;
+}
+
+.empty-sidebar p {
+  max-width: 320px;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.empty-sidebar-list {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 22px;
+  padding: 16px;
+  text-align: left;
+  background: #f7faf7;
+  border: 1px solid #e2ece3;
+  border-radius: 14px;
+  color: #405247;
+  font-size: 13px;
+}
+
+/* =========================
+   SIDEBAR HEADER
+========================= */
+
+.sidebar-header {
+  padding: 0 42px 18px;
+  margin-bottom: 18px;
+  text-align: center;
+  border-bottom: 1px solid #eef1ee;
+}
+
+.sidebar-header h2 {
+  margin-bottom: 4px;
+  color: #111827;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.sidebar-header p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.sidebar-header small {
+  display: block;
+  margin-top: 7px;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* =========================
+   AQI SUMMARY
+========================= */
+
+.aqi-summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 22px 0;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.aqi-circle {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border: 5px solid;
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  transition: 0.3s ease;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.09);
+}
+
+.aqi-text {
+  text-align: center;
+}
+
+.aqi-text span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8b9199;
+  font-size: 13px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.aqi-text h3 {
+  max-width: 330px;
+  margin: 0 auto 8px;
+  color: #403a55;
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.aqi-text p {
+  max-width: 310px;
+  margin: 0 auto;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================
+   RECOMMENDATION
+========================= */
+
+.recommendation-box {
+  margin-bottom: 22px;
+  padding: 15px 16px;
+  background: #f7faf7;
+  border: 1px solid #dfeade;
+  border-left: 5px solid #214d33;
+  border-radius: 14px;
+}
+
+.recommendation-box h4 {
+  margin: 0 0 7px;
+  color: #214d33;
+  font-size: 14px;
+  text-align: left;
+}
+
+.recommendation-box p {
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.section-title {
+  margin: 20px 0 14px;
+  color: #403a55;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* =========================
+   READING CARDS
+========================= */
+
+.readings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.reading-card,
+.reading-box {
+  min-width: 0;
+  padding: 14px;
+  background: #ffffff;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.reading-card:hover,
+.reading-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.09);
+}
+
+.reading-title {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.reading-card h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 26px;
+}
+
+.reading-card small {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.reading-box {
+  color: #555555;
+  font-size: 14px;
+}
+
+.reading-box strong {
+  display: block;
+  margin-top: 6px;
+  color: #214d33;
+  font-size: 24px;
+}
+
+/* =========================
+   FORECAST PANEL
+========================= */
+
+.forecast-panel {
+  margin-top: 30px;
+  padding-top: 24px;
+  padding-bottom: 40px;
+  border-top: 1px solid #e8ece9;
+}
+
+.forecast-heading {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.forecast-heading h4 {
+  margin: 0;
+  color: #214d33;
+  font-size: 18px;
+}
+
+.forecast-heading p {
+  margin-top: 4px;
+  color: #8b9199;
+  font-size: 12px;
+}
+
+.forecast-empty {
+  padding: 16px;
+  background: #f7faf7;
+  border: 1px solid #e3ebe4;
+  border-radius: 14px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.forecast-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.forecast-summary-card {
+  min-width: 0;
+  padding: 10px 5px;
+  background: #f7faf7;
+  border: 1px solid #e3ebe4;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.forecast-summary-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.forecast-summary-card strong {
+  display: block;
+  margin: 4px 0 1px;
+  color: #214d33;
+  font-size: 18px;
+}
+
+.forecast-summary-card small {
+  color: #9ca3af;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.trend-chart {
+  margin-top: 14px;
+  padding: 14px 10px 8px;
+  background: #ffffff;
+  border: 1px solid #e7ebe8;
+  border-radius: 16px;
+  box-shadow: 0 5px 16px rgba(30, 66, 44, 0.07);
+}
+
+.trend-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 8px;
+}
+
+.trend-chart-header h5 {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+}
+
+.trend-chart-header span {
+  color: #9ca3af;
+  font-size: 10px;
+}
+
+@media (max-width: 1100px) {
+  .forecast-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .forecast-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================
+   LEAFLET FIXES
+========================= */
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-popup-content {
+  min-width: 180px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.leaflet-popup-content strong {
+  color: #214d33;
+  font-size: 15px;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1100px) {
+  .side-panel {
+    width: 360px;
+  }
+}
+
+@media (max-width: 900px) {
+  .side-panel {
+    width: 330px;
+    padding: 18px;
+  }
+
+  .readings,
+  .forecast-grid {
+    gap: 9px;
+  }
+
+  .reading-card {
+    padding: 12px 8px;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
+
+  .dashboard {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .topbar {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 16px;
+  }
+
+  .logo {
+    font-size: 21px;
+  }
+
+  .status {
+    font-size: 12px;
+  }
+
+  .content {
+    height: auto;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .map-panel {
+    height: 55vh;
+    min-height: 420px;
+  }
+
+  .side-panel {
+    width: 100%;
+    min-height: 460px;
+    height: auto;
+    overflow: visible;
+    border-top: 1px solid #dddddd;
+    border-left: none;
+  }
+
+  .map-controls {
+    top: 12px;
+    left: 52px;
+  }
+
+  .map-controls button {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  .aqi-legend {
+    left: 12px;
+    bottom: 12px;
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .empty-sidebar {
+    min-height: 460px;
+  }
+}
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 480px) {
+  .topbar {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .side-panel {
+    padding: 18px;
+  }
+
+  .readings,
+  .forecast-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aqi-circle {
+    width: 90px;
+    height: 90px;
+    font-size: 32px;
+  }
+
+  .aqi-legend {
+    max-width: calc(100% - 24px);
+  }
+
+  .map-controls {
+    max-width: calc(100% - 64px);
+    overflow-x: auto;
+  }
+}
+.map-popup {
+  min-width: 210px;
+  padding: 2px;
+}
+
+.map-popup-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #8b9199;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.map-popup h3 {
+  margin: 0 0 3px;
+  color: #17211b;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.map-popup p {
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.map-popup-aqi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  background: #f7faf7;
+  border: 1px solid #e4ece5;
+  border-radius: 10px;
+}
+
+.map-popup-aqi span {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.map-popup-aqi strong {
+  color: #214d33;
+  font-size: 22px;
+}
+
+.map-popup-status {
+  margin: 9px 0 12px;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.map-popup-button {
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 9px;
+  background: #214d33;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.map-popup-button:hover {
+  background: #173a26;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+}
+
+.leaflet-popup-content {
+  margin: 15px;
+}
+/* =========================
+   AQI MAP MARKERS
+========================= */
+
+.aqi-marker-wrapper {
+  background: transparent;
+  border: none;
+}
+
+.aqi-map-marker {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+  background: var(--marker-color);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.28),
+    0 0 0 6px var(--marker-glow);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.aqi-map-marker:hover {
+  transform: scale(1.14);
+  box-shadow:
+    0 7px 18px rgba(0, 0, 0, 0.34),
+    0 0 0 9px var(--marker-glow);
+}
+
+.aqi-map-marker.selected {
+  animation: selected-marker-pulse 1.8s infinite;
+}
+
+@keyframes selected-marker-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 5px 14px rgba(0, 0, 0, 0.3),
+      0 0 0 5px var(--marker-glow);
+  }
+
+  50% {
+    box-shadow:
+      0 7px 20px rgba(0, 0, 0, 0.35),
+      0 0 0 12px transparent;
+  }
+}

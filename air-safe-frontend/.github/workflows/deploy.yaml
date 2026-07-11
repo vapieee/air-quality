@@ -1,0 +1,54 @@
+name: AIR-SAFE Frontend Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          # 1. Tell the cache where the package-lock.json lives
+          cache-dependency-path: './air-safe-frontend/package-lock.json' 
+
+      - name: Install dependencies
+        # 2. Add 'working-directory' to these steps
+        working-directory: ./air-safe-frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: ./air-safe-frontend
+        run: npm run build
+        env:
+          VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # 3. Point this directly to the dist folder inside your subfolder
+          path: './air-safe-frontend/dist' 
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

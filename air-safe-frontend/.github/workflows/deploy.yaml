@@ -29,11 +29,10 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          # 1. Tell the cache where the package-lock.json lives
+          # Fixed syntax requirement: This is valid as long as it's indented perfectly inside 'with'
           cache-dependency-path: './air-safe-frontend/package-lock.json' 
 
       - name: Install dependencies
-        # 2. Add 'working-directory' to these steps
         working-directory: ./air-safe-frontend
         run: npm ci
 
@@ -46,7 +45,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 3. Point this directly to the dist folder inside your subfolder
           path: './air-safe-frontend/dist' 
 
       - name: Deploy to GitHub Pages

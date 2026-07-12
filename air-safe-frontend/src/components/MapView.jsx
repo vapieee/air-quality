@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   MapContainer,
   Marker,
@@ -8,6 +8,10 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet.heat";
+
+// top of file, outside the component
+const DEFAULT_CENTER = [13.6218, 123.1948];
+const DEFAULT_ZOOM = 14;
 
 function getAQIColor(aqi) {
   if (aqi <= 50) return "#2ecc71";
@@ -46,24 +50,39 @@ function createAQIMarker(location, isSelected) {
 
 function MapController({ selectedLocation }) {
   const map = useMap();
+  const prevIdRef = useRef(null);
 
+  // Handles container resize only — runs once on mount
   useEffect(() => {
     const resizeTimer = window.setTimeout(() => {
       map.invalidateSize();
-
-      if (selectedLocation) {
-        map.flyTo(
-          [selectedLocation.lat, selectedLocation.lng],
-          15,
-          {
-            duration: 1,
-          }
-        );
-      }
     }, 200);
 
     return () => window.clearTimeout(resizeTimer);
-  }, [map, selectedLocation]);
+  }, [map]);
+
+  // Handles flying to a location — only when the SELECTED ID changes
+  useEffect(() => {
+    if (!selectedLocation) {
+      prevIdRef.current = null;
+      return;
+    }
+    console.log("prevId:", prevIdRef.current, "newId:", selectedLocation.id); // TEMP DEBUG
+
+
+    if (prevIdRef.current !== selectedLocation.id) {
+      prevIdRef.current = selectedLocation.id;
+
+      const currentZoom = map.getZoom();
+      const targetZoom = Math.max(currentZoom, 15);
+
+      map.flyTo(
+        [selectedLocation.lat, selectedLocation.lng],
+        targetZoom,
+        { duration: 1 }
+      );
+    }
+  }, [map, selectedLocation?.id, selectedLocation?.lat, selectedLocation?.lng]);
 
   return null;
 }
@@ -121,8 +140,8 @@ function MapView({
 
   return (
     <MapContainer
-      center={[13.6218, 123.1948]}
-      zoom={14}
+      center={DEFAULT_CENTER}
+      zoom={DEFAULT_ZOOM}
       scrollWheelZoom
       className="map"
     >

@@ -29,7 +29,7 @@ function TrendChart({
     <div className="trend-chart">
       <div className="trend-chart-header">
         <h5>{title}</h5>
-        <span>Every 3 hours</span>
+        <span>Next 3 hours</span>
       </div>
 
       <ResponsiveContainer width="100%" height={150}>

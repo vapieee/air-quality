@@ -6,7 +6,7 @@ function ForecastPanel({ forecast }) {
       <section className="forecast-panel">
         <div className="forecast-heading">
           <h4>Forecast</h4>
-          <p>Predictions every 3 hours</p>
+          <p>Predictions for the next 3 hours</p>
         </div>
 
         <div className="forecast-empty">
@@ -20,7 +20,7 @@ function ForecastPanel({ forecast }) {
     <section className="forecast-panel">
       <div className="forecast-heading">
         <h4>Forecast</h4>
-        <p>Predictions every 3 hours</p>
+        <p>Predictions for the next 3 hours</p>
       </div>
 
       <div className="forecast-summary">
@@ -63,6 +63,24 @@ function ForecastPanel({ forecast }) {
         dataKey="no2"
         color="#4da3ff"
         unit=" µg/m³"
+      />
+
+      <TrendChart
+        title="Temperature"
+        data={forecast}
+        dataKey="temperature"
+        color="#ff6b6b"
+        unit=" °C"
+        decimals={1}
+      />
+
+      <TrendChart
+        title="Humidity"
+        data={forecast}
+        dataKey="humidity"
+        color="#53c7f0"
+        unit=" %"
+        decimals={1}
       />
     </section>
   );

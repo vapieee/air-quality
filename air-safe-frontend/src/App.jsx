@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-import { locations } from "./data/mockData";
+import { locations, subscribe } from "./data/Data";
 
 import MapView from "./components/MapView";
 import AQILegend from "./components/AQILegend";
@@ -10,8 +10,23 @@ import ReadingCard from "./components/ReadingCard";
 import ForecastPanel from "./components/ForecastPanel";
 
 function App() {
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [mapLocations, setMapLocations] = useState([...locations]);
+  const [selectedLocationId, setSelectedLocationId] = useState(null);
   const [mapMode, setMapMode] = useState("markers");
+
+  useEffect(() => {
+    const unsubscribe = subscribe((newLocations) => {
+      setMapLocations([...newLocations]);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const selectedLocation = useMemo(() => {
+    return (
+      mapLocations.find((loc) => loc.id === selectedLocationId) || null
+    );
+  }, [mapLocations, selectedLocationId]);
 
   const getAQIColor = (aqi) => {
     if (aqi <= 50) {
@@ -56,12 +71,17 @@ function App() {
 
       <main className="content">
         <section className="map-panel">
-          <MapControls mapMode={mapMode} setMapMode={setMapMode} />
+          <MapControls
+            mapMode={mapMode}
+            setMapMode={setMapMode}
+          />
 
           <MapView
-            locations={locations}
+            locations={mapLocations}
             selectedLocation={selectedLocation}
-            onSelectLocation={setSelectedLocation}
+            onSelectLocation={(location) =>
+              setSelectedLocationId(location.id)
+            }
             mapMode={mapMode}
           />
 
@@ -73,15 +93,22 @@ function App() {
             <button
               type="button"
               className="close-btn"
-              onClick={() => setSelectedLocation(null)}
+              onClick={() => setSelectedLocationId(null)}
             >
               ×
             </button>
 
             <div className="sidebar-header">
               <h2>{selectedLocation.name}</h2>
+
               <p>{selectedLocation.city}</p>
-              <small>Updated: {new Date().toLocaleString()}</small>
+
+              <small>
+                Updated:{" "}
+                {new Date(
+                  selectedLocation.timestamp * 1000
+                ).toLocaleString()}
+              </small>
             </div>
 
             <div className="aqi-summary-card">
@@ -98,20 +125,29 @@ function App() {
 
               <div className="aqi-text">
                 <span>AQI</span>
+
                 <h3>{selectedLocation.status}</h3>
-                <p>Some pollutants may affect sensitive individuals.</p>
+
+                <p>
+                  Some pollutants may affect sensitive
+                  individuals.
+                </p>
               </div>
             </div>
 
             <div className="recommendation-box">
               <h4>Health Recommendation</h4>
+
               <p>
-                Sensitive individuals should reduce prolonged outdoor exposure.
-                General public may continue normal activities.
+                Sensitive individuals should reduce
+                prolonged outdoor exposure. General public
+                may continue normal activities.
               </p>
             </div>
 
-            <h4 className="section-title">Current Readings</h4>
+            <h4 className="section-title">
+              Current Readings
+            </h4>
 
             <div className="readings">
               <ReadingCard
@@ -131,7 +167,7 @@ function App() {
               <ReadingCard
                 title="NO₂"
                 value={selectedLocation.no2}
-                unit="µg/m³"
+                unit="ppm"
                 color="#4DA3FF"
               />
 
@@ -142,7 +178,7 @@ function App() {
                 color="#FF6B6B"
               />
 
-              <ReadingCard
+            <ReadingCard
                 title="Humidity"
                 value={selectedLocation.humidity}
                 unit="%"
@@ -157,7 +193,9 @@ function App() {
               />
             </div>
 
-            <ForecastPanel forecast={selectedLocation.forecast} />
+            <ForecastPanel
+              forecast={selectedLocation.forecast}
+            />
           </aside>
         )}
       </main>

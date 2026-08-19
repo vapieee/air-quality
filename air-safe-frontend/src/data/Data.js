@@ -1,4 +1,4 @@
-const BASE_URL = "https://52.76.3.44";
+const BASE_URL = "http://52.76.3.44";
 
 export let locations = [];
 

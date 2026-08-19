@@ -1,4 +1,4 @@
-const BASE_URL = "https://air-safe-delta.vercel.app";
+const BASE_URL = "https://52.76.3.44";
 
 export let locations = [];
 
@@ -35,6 +35,18 @@ async function fetchForecastData(stationId) {
   return response.json();
 }
 
+async function fetchHistoricalData(stationId) {
+  const response = await fetch(
+    `${BASE_URL}/monitor/history/${stationId}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch historical data for station ${stationId}`);
+  }
+
+  return response.json();
+}
+
 // Helper functions to convert API data into a more usable format
 function componentsToObject(components = []) {
   const obj = {};
@@ -56,8 +68,8 @@ function buildForecast(now, forecast) {
       time: "Now",
       aqi: now.aqi,
       pm25: now.pm25_ugm3,
-      co: now.co_ppm,
-      no2: now.no2_ppm,
+      co: now.co_ugm3,
+      no2: now.no2_ugm3,
       temperature: now.temp_c,
       humidity: now.humidity_pct,
     },
@@ -65,8 +77,8 @@ function buildForecast(now, forecast) {
       time: "+1h",
       aqi: h1.aqi,
       pm25: h1.pm25_ugm3,
-      co: h1.co_ppm,
-      no2: h1.no2_ppm,
+      co: h1.co_ugm3,
+      no2: h1.no2_ugm3,
       temperature: h1.temp_c,
       humidity: h1.humidity_pct,
     },
@@ -74,8 +86,8 @@ function buildForecast(now, forecast) {
       time: "+2h",
       aqi: h2.aqi,
       pm25: h2.pm25_ugm3,
-      co: h2.co_ppm,
-      no2: h2.no2_ppm,
+      co: h2.co_ugm3,
+      no2: h2.no2_ugm3,
       temperature: h2.temp_c,
       humidity: h2.humidity_pct,
     },
@@ -83,8 +95,8 @@ function buildForecast(now, forecast) {
       time: "+3h",
       aqi: h3.aqi,
       pm25: h3.pm25_ugm3,
-      co: h3.co_ppm,
-      no2: h3.no2_ppm,
+      co: h3.co_ugm3,
+      no2: h3.no2_ugm3,
       temperature: h3.temp_c,
       humidity: h3.humidity_pct,
     },
@@ -117,8 +129,8 @@ async function getLocations() {
         aqi: now.aqi,
 
         pm25: now.pm25_ugm3,
-        co: now.co_ppm,
-        no2: now.no2_ppm,
+        co: now.co_ugm3,
+        no2: now.no2_ugm3,
         temperature: now.temp_c,
         humidity: now.humidity_pct,
 

@@ -102,12 +102,11 @@ function App() {
               <h2>{selectedLocation.name}</h2>
 
               <p>{selectedLocation.city}</p>
-
               <small>
                 Updated:{" "}
-                {new Date(
-                  selectedLocation.timestamp * 1000
-                ).toLocaleString()}
+                {selectedLocation.timestamp
+                  ? new Date(selectedLocation.timestamp).toLocaleString()
+                  : "No Data"}
               </small>
             </div>
 

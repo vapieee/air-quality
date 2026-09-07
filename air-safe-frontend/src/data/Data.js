@@ -211,47 +211,30 @@ function notifyListeners() {
 
 // APPLY CURRENT READING
 
-function applyReading(
-  stationId,
-  reading
-) {
-  const location = findLocation(
-    stationId
-  );
+function applyReading(stationId, reading) {
+  const location = findLocation(stationId);
 
   if (!location) {
     console.warn(
       `Received reading for unknown station ${stationId}`
     );
-
     return;
   }
 
-  const aqi = reading.aqi;
+  // Convert backend "components" array into an object.
+  const components = componentsToObject(
+    reading.components || []
+  );
 
-  location.timestamp =
-    reading.timestamp;
+  location.timestamp = reading.timestamp;
+  location.status = reading.status;
 
-  location.status =
-    reading.status;
-
-  location.aqi =
-    aqi;
-
-  location.pm25 =
-    reading.pm25_ugm3;
-
-  location.co =
-    reading.co_ugm3;
-
-  location.no2 =
-    reading.no2_ugm3;
-
-  location.temperature =
-    reading.temp_c;
-
-  location.humidity =
-    reading.humidity_pct;
+  location.aqi = components.aqi ?? null;
+  location.pm25 = components.pm25_ugm3 ?? null;
+  location.co = components.co_ugm3 ?? null;
+  location.no2 = components.no2_ugm3 ?? null;
+  location.temperature = components.temp_c ?? null;
+  location.humidity = components.humidity_pct ?? null;
 
   // Update "Now" in forecast if it already exists.
   if (
@@ -260,18 +243,12 @@ function applyReading(
   ) {
     location.forecast[0] = {
       time: "Now",
-
-      aqi: reading.aqi,
-
-      pm25: reading.pm25_ugm3,
-
-      co: reading.co_ugm3,
-
-      no2: reading.no2_ugm3,
-
-      temperature: reading.temp_c,
-
-      humidity: reading.humidity_pct,
+      aqi: components.aqi ?? null,
+      pm25: components.pm25_ugm3 ?? null,
+      co: components.co_ugm3 ?? null,
+      no2: components.no2 ?? null,
+      temperature: components.temp_c ?? null,
+      humidity: components.humidity_pct ?? null,
     };
   }
 

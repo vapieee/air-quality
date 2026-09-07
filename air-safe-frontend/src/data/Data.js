@@ -10,6 +10,32 @@ const listeners = [];
 const readSockets = new Map();
 const forecastSockets = new Map();
 
+// Exponential backoff state, per station + channel, so a broken
+// endpoint doesn't get hammered every 3 seconds forever.
+const readReconnectDelays = new Map();
+const forecastReconnectDelays = new Map();
+
+const MIN_RECONNECT_DELAY_MS = 3000;
+const MAX_RECONNECT_DELAY_MS = 30000;
+
+function nextReconnectDelay(delaysMap, stationId) {
+  const current =
+    delaysMap.get(stationId) ?? MIN_RECONNECT_DELAY_MS;
+
+  const next = Math.min(
+    current * 2,
+    MAX_RECONNECT_DELAY_MS
+  );
+
+  delaysMap.set(stationId, next);
+
+  return current;
+}
+
+function resetReconnectDelay(delaysMap, stationId) {
+  delaysMap.set(stationId, MIN_RECONNECT_DELAY_MS);
+}
+
 
 // HTTP FUNCTIONS
 
@@ -300,6 +326,11 @@ function connectReadSocket(
     console.log(
       `[WS] READ connected: station ${stationId}`
     );
+
+    resetReconnectDelay(
+      readReconnectDelays,
+      stationId
+    );
   };
   socket.onmessage = (event) => {
     try {
@@ -369,17 +400,23 @@ function connectReadSocket(
     );
   };
 
-  socket.onclose = () => {
+  socket.onclose = (event) => {
 
     console.log(
-      `[WS] READ closed: station ${stationId}`
+      `[WS] READ closed: station ${stationId} ` +
+      `(code ${event.code}${event.reason ? `, reason: ${event.reason}` : ""})`
     );
 
     readSockets.delete(
       stationId
     );
 
-    // Automatically reconnect.
+    // Automatically reconnect, backing off if it keeps failing.
+    const delay = nextReconnectDelay(
+      readReconnectDelays,
+      stationId
+    );
+
     setTimeout(() => {
 
       if (
@@ -390,7 +427,7 @@ function connectReadSocket(
         );
       }
 
-    }, 3000);
+    }, delay);
   };
 }
 
@@ -421,6 +458,11 @@ function connectForecastSocket(
   socket.onopen = () => {
     console.log(
       `[WS] FORECAST connected: station ${stationId}`
+    );
+
+    resetReconnectDelay(
+      forecastReconnectDelays,
+      stationId
     );
   };
   socket.onmessage = (event) => {
@@ -581,17 +623,23 @@ function connectForecastSocket(
     );
   };
 
-  socket.onclose = () => {
+  socket.onclose = (event) => {
 
     console.log(
-      `[WS] FORECAST closed: station ${stationId}`
+      `[WS] FORECAST closed: station ${stationId} ` +
+      `(code ${event.code}${event.reason ? `, reason: ${event.reason}` : ""})`
     );
 
     forecastSockets.delete(
       stationId
     );
 
-    // Automatically reconnect.
+    // Automatically reconnect, backing off if it keeps failing.
+    const delay = nextReconnectDelay(
+      forecastReconnectDelays,
+      stationId
+    );
+
     setTimeout(() => {
 
       if (
@@ -604,7 +652,7 @@ function connectForecastSocket(
         );
       }
 
-    }, 3000);
+    }, delay);
   };
 }
 

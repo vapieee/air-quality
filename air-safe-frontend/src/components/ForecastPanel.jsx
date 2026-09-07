@@ -53,7 +53,7 @@ function ForecastPanel({ forecast }) {
         data={forecast}
         dataKey="co"
         color="#47b04b"
-        unit=" ppm"
+        unit="µg/m³"
         decimals={1}
       />
 

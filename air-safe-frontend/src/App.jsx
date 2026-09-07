@@ -159,14 +159,14 @@ function App() {
               <ReadingCard
                 title="CO"
                 value={selectedLocation.co}
-                unit="ppm"
+                unit="µg/m³"
                 color="#47B04B"
               />
 
               <ReadingCard
                 title="NO₂"
                 value={selectedLocation.no2}
-                unit="ppm"
+                unit="µg/m³"
                 color="#4DA3FF"
               />
 

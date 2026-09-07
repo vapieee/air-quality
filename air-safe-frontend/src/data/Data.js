@@ -52,6 +52,33 @@ async function fetchStations() {
   return response.json();
 }
 
+async function fetchLatestReading(stationId) {
+  const response = await fetch(
+    `${BASE_URL}/monitor/read/${stationId}`
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch latest reading for station ${stationId}`
+    );
+  }
+
+  return response.json();
+}
+
+async function fetchLatestForecast(stationId) {
+  const response = await fetch(
+    `${BASE_URL}/monitor/forecast/${stationId}`
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch latest forecast for station ${stationId}`
+    );
+  }
+
+  return response.json();
+}
 
 // History is fetched only when requested.
 export async function fetchHistoricalData(stationId) {
@@ -671,53 +698,24 @@ async function initializeLocations() {
       locations.length
     );
 
-    for (
-      const station of stations
-    ) {
+    for (const station of stations) {
 
       locations.push({
-
-        id:
-          Number(
-            station.station_id
-          ),
-
-        name:
-          station.name,
-
-        city:
-          station.city,
-
-        lat:
-          station.latitude,
-
-        lng:
-          station.longitude,
-
-        timestamp:
-          null,
-
-        status:
-          "No Data",
-
-        aqi:
-          null,
-
-        pm25:
-          null,
-
-        co:
-          null,
-
-        no2:
-          null,
-
-        temperature:
-          null,
-
-        humidity:
-          null,
-
+        id: Number(station.station_id),
+        name: station.name,
+        city: station.city,
+        lat: station.latitude,
+        lng: station.longitude,
+    
+        timestamp: null,
+        status: "No Data",
+        aqi: null,
+        pm25: null,
+        co: null,
+        no2: null,
+        temperature: null,
+        humidity: null,
+    
         forecast: [
           {
             time: "Now",
@@ -728,7 +726,6 @@ async function initializeLocations() {
             temperature: null,
             humidity: null,
           },
-
           {
             time: "+1h",
             aqi: null,
@@ -738,7 +735,6 @@ async function initializeLocations() {
             temperature: null,
             humidity: null,
           },
-
           {
             time: "+2h",
             aqi: null,
@@ -748,7 +744,6 @@ async function initializeLocations() {
             temperature: null,
             humidity: null,
           },
-
           {
             time: "+3h",
             aqi: null,
@@ -760,15 +755,53 @@ async function initializeLocations() {
           },
         ],
       });
-
-      // Open WebSocket connections.
-      connectReadSocket(
-        station.station_id
-      );
-
-      connectForecastSocket(
-        station.station_id
-      );
+    
+      // Get latest data from DB first.
+      try {
+        const reading = await fetchLatestReading(
+          station.station_id
+        );
+    
+        console.log(
+          `[HTTP] Latest reading for station ${station.station_id}:`,
+          reading
+        );
+    
+        applyReading(
+          station.station_id,
+          reading
+        );
+      } catch (error) {
+        console.error(
+          `[HTTP] Failed to load reading for station ${station.station_id}:`,
+          error
+        );
+      }
+    
+      try {
+        const forecast = await fetchLatestForecast(
+          station.station_id
+        );
+    
+        console.log(
+          `[HTTP] Latest forecast for station ${station.station_id}:`,
+          forecast
+        );
+    
+        applyForecast(
+          station.station_id,
+          forecast
+        );
+      } catch (error) {
+        console.error(
+          `[HTTP] Failed to load forecast for station ${station.station_id}:`,
+          error
+        );
+      }
+    
+      // Then open WebSockets for future updates.
+      connectReadSocket(station.station_id);
+      connectForecastSocket(station.station_id);
     }
 
     notifyListeners();

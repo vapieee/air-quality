@@ -105,16 +105,9 @@ function App() {
               <small>
               Updated:{" "}
               {selectedLocation.timestamp
-                ? new Date(selectedLocation.timestamp).toLocaleString("en-PH", {
-                    timeZone: "Asia/Manila",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    hour12: true,
-                  })
+                ? selectedLocation.timestamp
+                    .replace("T", " ")
+                    .replace("+00:00", "")
                 : "No Data"}
             </small>
             </div>

@@ -13,7 +13,7 @@ function TrendChart({
   dataKey,
   color,
   unit = "",
-  decimals = 0,
+  decimals = null,
 }) {
   const formatValue = (value) => {
     const number = Number(value);
@@ -22,7 +22,14 @@ function TrendChart({
       return value;
     }
 
-    return `${number.toFixed(decimals)}${unit}`;
+    // Use explicit decimal formatting only when decimals is provided.
+    // Otherwise preserve the raw numeric value without rounding.
+    const formatted =
+      decimals === null || decimals === undefined
+        ? String(value)
+        : number.toFixed(decimals);
+
+    return `${formatted}${unit}`;
   };
 
   return (

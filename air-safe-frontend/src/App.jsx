@@ -9,6 +9,26 @@ import MapControls from "./components/MapControls";
 import ReadingCard from "./components/ReadingCard";
 import ForecastPanel from "./components/ForecastPanel";
 
+function formatTimestamp(timestamp) {
+  if (!timestamp) return "No Data";
+
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) {
+    return timestamp;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Manila",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
+}
+
 function App() {
   const [mapLocations, setMapLocations] = useState([...locations]);
   const [selectedLocationId, setSelectedLocationId] = useState(null);
@@ -60,13 +80,13 @@ function App() {
     <div className="dashboard">
       <header className="topbar">
         <div className="logo">● AIR-SAFE</div>
-
+{/* 
         <div className="status">
           ● LIVE —{" "}
           {selectedLocation
             ? `${selectedLocation.name}, ${selectedLocation.city}`
             : "Naga City, Camarines Sur"}
-        </div>
+        </div> */}
       </header>
 
       <main className="content">
@@ -105,9 +125,7 @@ function App() {
               <small>
               Updated:{" "}
               {selectedLocation.timestamp
-                ? selectedLocation.timestamp
-                    .replace("T", " ")
-                    .replace("+00:00", "")
+                ? formatTimestamp(selectedLocation.timestamp)
                 : "No Data"}
             </small>
             </div>

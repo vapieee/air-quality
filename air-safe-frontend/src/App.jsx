@@ -207,7 +207,7 @@ function App() {
               <ReadingCard
                 title="AQI"
                 value={selectedLocation.aqi}
-                unit="US EPA"
+                unit="Modified DENR-Based AQI"
                 color="#8E6BFF"
               />
             </div>
